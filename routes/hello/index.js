@@ -1,14 +1,16 @@
-module.exports = async(fastify, opts) => {
-    
+const fastify = require('fastify')();
+const { connect } = require('./database');
+const usuario = require('./user');
+
     const schema = {
-        response:{
-            200:{
+        response: {
+            200: {
                 type: 'object',
-                properties:{
+                properties: {
                     message: {
                         type: 'string'
                     },
-                    today:{
+                    today: {
                         type: 'string'
                     },
                     // username:{
@@ -19,8 +21,13 @@ module.exports = async(fastify, opts) => {
         }
     }
 
-    function getValueFromDataBase(){
-        return{
+    fastify.get('/users', async (request, reply) => {
+        const users = await usuario.findAll();
+        reply.send(users);
+    });
+
+    function getValueFromDataBase() {
+        return {
             message: 'teste',
         }
     }
@@ -30,24 +37,11 @@ module.exports = async(fastify, opts) => {
         const sumResult = await client.query('SELECT * FROM usuario WHERE idusuario=$1', [req.params.id]);
         client.release();
         const dadoFormatado = sumResult.rows;
-        return{dadoFormatado}
-        // fastify.pg.connect(onConnect)
-        // function onConnect (err, client, release) {
-        //   if (err) return reply.send(err)
-      
-        //   client.query(
-        //     'SELECT * FROM usuario WHERE id=$1', [req.params.id],
-        //     function onResult (err, result) {
-        //       release()
-        //       return reply.send(err || result)
-        //     }
-        //   )
-        // }
-        
-      })
+        return { dadoFormatado }
 
-      
-    fastify.get('/', {schema}, async (req, reply) =>{
+    })
+
+    fastify.get('/', { schema }, async (req, reply) => {
         const responseFromBD = getValueFromDataBase();
         const today = fastify.date.getDate(new Date().toLocaleDateString())
         return reply.send({
@@ -56,4 +50,3 @@ module.exports = async(fastify, opts) => {
             // username
         })
     });
-}
