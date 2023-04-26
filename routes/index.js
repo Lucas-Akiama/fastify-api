@@ -1,6 +1,6 @@
 const fastify = require('fastify')();
-const { connect } = require('./database');
-const usuario = require('./user');
+const { connect } = require('../database');
+const usuario = require('../user');
 
     const schema = {
         response: {
